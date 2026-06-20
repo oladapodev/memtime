@@ -14,6 +14,7 @@ import {
   failRun,
   getRun,
   getRepoId,
+  getInstallationForRepo,
   getIndexStatus,
   getDocsForRepo,
   getTriggerConfig,
@@ -597,14 +598,17 @@ export default {
         const repoFullName = url.pathname.split("/").at(3) ?? "";
         const action = url.pathname.split("/").at(4);
         if (action === "index") {
+          // Look up the installation ID for this repo
+          const inst = await getInstallationForRepo(env.DB, repoFullName);
+          if (!inst) return json({ error: "repo not found or no active installation" }, { status: 404 });
           await env.QUEUE.send({
             type: "index",
             repoId: repoFullName,
             repoUrl: `https://github.com/${repoFullName}.git`,
             defaultBranch: "main",
-            installationId: 0,
-          });
-          return json({ ok: true, action: "index_queued", repoId: repoFullName });
+            installationId: inst.githubInstallationId,
+          } as IndexJob);
+          return json({ ok: true, action: "index_queued", repoId: repoFullName, installationId: inst.githubInstallationId });
         }
       }
       if (url.pathname.match(/^\/api\/repos\/[^/]+\/index\/status$/) && request.method === "GET") {

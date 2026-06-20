@@ -176,6 +176,18 @@ export async function getRepoId(db: D1DatabaseLike, fullName: string): Promise<s
   return row?.id ?? null;
 }
 
+export async function getInstallationForRepo(db: D1DatabaseLike, fullName: string): Promise<{ installationKey: string; githubInstallationId: number } | null> {
+  const row = await db
+    .prepare(`SELECT i.id as installation_key, i.github_installation_id
+       FROM repos r
+       JOIN installations i ON i.id = r.installation_id
+       WHERE r.full_name = ? AND i.status = 'active'`)
+    .bind(fullName)
+    .first<{ installation_key: string; github_installation_id: number }>();
+  if (!row) return null;
+  return { installationKey: row.installation_key, githubInstallationId: row.github_installation_id };
+}
+
 export async function saveIndexProgress(
   db: D1DatabaseLike,
   repoId: string,
