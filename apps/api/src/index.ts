@@ -101,15 +101,17 @@ async function handleInstallation(body: {
   const installationKey = await markInstallationActive(env.DB, body.installation.id, body.installation.account?.login ?? "unknown");
 
   if (body.repositories) {
-    const indexJobs: IndexJob[] = body.repositories.map((repo) => ({
-      type: "index",
-      repoId: repo.full_name,
-      repoUrl: `https://github.com/${repo.full_name}.git`,
-      defaultBranch: repo.default_branch,
-      installationId: body.installation.id,
-    }));
-    for (const job of indexJobs) {
-      await env.QUEUE.send(job);
+    for (const repo of body.repositories) {
+      // Create repo record in DB
+      await upsertRepo(env.DB, installationKey, repo.full_name, repo.default_branch ?? "main");
+      // Enqueue indexing job
+      await env.QUEUE.send({
+        type: "index",
+        repoId: repo.full_name,
+        repoUrl: `https://github.com/${repo.full_name}.git`,
+        defaultBranch: repo.default_branch ?? "main",
+        installationId: body.installation.id,
+      } as IndexJob);
     }
   }
 
@@ -235,15 +237,20 @@ async function handleInstallationRepos(body: {
   repositories_added?: Array<{ full_name: string; default_branch: string }>;
   repositories_removed?: Array<{ full_name: string }>;
 }, env: Env): Promise<Response> {
+  const installationKey = `inst_${body.installation.id}`;
+
   if (body.repositories_added) {
     for (const repo of body.repositories_added) {
+      // Create repo record in DB
+      await upsertRepo(env.DB, installationKey, repo.full_name, repo.default_branch ?? "main");
+      // Enqueue indexing job
       await env.QUEUE.send({
         type: "index",
         repoId: repo.full_name,
         repoUrl: `https://github.com/${repo.full_name}.git`,
         defaultBranch: repo.default_branch ?? "main",
         installationId: body.installation.id,
-      });
+      } as IndexJob);
     }
   }
   return json({ ok: true, added: body.repositories_added?.length ?? 0, removed: body.repositories_removed?.length ?? 0 });

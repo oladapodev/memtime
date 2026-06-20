@@ -4,6 +4,8 @@ import {
   ArrowsClockwise,
   FileText,
   Lightning,
+  MagnifyingGlass,
+  XCircle,
 } from "@phosphor-icons/react";
 import { Card } from "../design-system/components/Card";
 import { Badge } from "../design-system/components/Badge";
@@ -37,6 +39,7 @@ export function Repositories() {
   const [progress, setProgress] = useState<Map<string, IndexProgress>>(new Map());
   const [triggerModes, setTriggerModes] = useState<Map<string, string>>(new Map());
   const [savingTrigger, setSavingTrigger] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchRepos = useCallback(async () => {
     const res = await fetch("/api/repos");
@@ -141,7 +144,39 @@ export function Repositories() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {repos.map((repo) => {
+          {/* Search bar */}
+          <div className="relative">
+            <MagnifyingGlass size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" weight="regular" />
+            <input
+              type="text"
+              placeholder="Search repositories…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-9 pl-9 pr-8 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700/50 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                <XCircle size={15} weight="fill" />
+              </button>
+            )}
+          </div>
+
+          {repos.filter((r) =>
+            r.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+          ).length === 0 ? (
+            <Card className="p-6">
+              <Empty
+                icon={<MagnifyingGlass size={32} weight="duotone" />}
+                title="No matches"
+                message={`No repositories matching "${searchQuery}".`}
+              />
+            </Card>
+          ) : repos.filter((r) =>
+            r.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+          ).map((repo) => {
             const prog = progress.get(repo.full_name);
             const isIndexing = indexing.has(repo.full_name);
             const status = prog?.status ?? repo.index_status ?? "pending";
