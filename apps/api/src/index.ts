@@ -104,16 +104,8 @@ async function handleInstallation(body: {
 
   if (body.repositories) {
     for (const repo of body.repositories) {
-      // Create repo record in DB
+      // Only create repo record — no auto-indexing. Index on demand from dashboard.
       await upsertRepo(env.DB, installationKey, repo.full_name, repo.default_branch ?? "main");
-      // Enqueue indexing job
-      await env.QUEUE.send({
-        type: "index",
-        repoId: repo.full_name,
-        repoUrl: `https://github.com/${repo.full_name}.git`,
-        defaultBranch: repo.default_branch ?? "main",
-        installationId: body.installation.id,
-      } as IndexJob);
     }
   }
 
@@ -243,16 +235,8 @@ async function handleInstallationRepos(body: {
 
   if (body.repositories_added) {
     for (const repo of body.repositories_added) {
-      // Create repo record in DB
+      // Only create repo record — no auto-indexing. Index on demand from dashboard.
       await upsertRepo(env.DB, installationKey, repo.full_name, repo.default_branch ?? "main");
-      // Enqueue indexing job
-      await env.QUEUE.send({
-        type: "index",
-        repoId: repo.full_name,
-        repoUrl: `https://github.com/${repo.full_name}.git`,
-        defaultBranch: repo.default_branch ?? "main",
-        installationId: body.installation.id,
-      } as IndexJob);
     }
   }
   return json({ ok: true, added: body.repositories_added?.length ?? 0, removed: body.repositories_removed?.length ?? 0 });

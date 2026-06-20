@@ -32,7 +32,8 @@ jobs:
           MEMFORK_RELAYER_URL: ${{ vars.MEMFORK_RELAYER_URL || 'https://relayer.memory.walrus.xyz' }}
           MEMFORK_RESOLVER_ID: ${{ secrets.MEMFORK_RESOLVER_ID }}
         run: bun packages/cli/src/index.ts review --range origin/${{ github.base_ref }}...HEAD --repo ${{ github.repository }} --pr ${{ github.event.pull_request.number }} > forkbot-review.md
-      - name: Comment on PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr comment ${{ github.event.pull_request.number }} --body-file forkbot-review.md
+      # Commenting disabled — ForkBot posts via GitHub App webhook instead
+      # - name: Comment on PR
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: gh pr comment ${{ github.event.pull_request.number }} --body-file forkbot-review.md
