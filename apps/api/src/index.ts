@@ -480,12 +480,11 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
     },
   });
   if (!userRes.ok) {
-    const userErrorText = await userRes.text();
-    const userErrorText = await userRes.text();
-    console.error("GitHub user fetch failed", { status: userRes.status, body: userErrorText });
+    const errorBody = await userRes.text();
+    console.error("GitHub user fetch failed", { status: userRes.status, body: errorBody });
     return json({
       error: "user fetch failed",
-      detail: `GitHub returned ${userRes.status}: ${userErrorText.substring(0, 300)}`,
+      detail: `GitHub returned ${userRes.status}: ${errorBody.substring(0, 300)}`,
       hint: "Go to https://github.com/settings/apps/forkbot-dev → 'Permissions' > 'Account permissions' > set 'GitHub user profile' to 'Read-only' then Save."
     }, { status: 502 });
   }
