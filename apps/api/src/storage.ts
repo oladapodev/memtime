@@ -63,6 +63,8 @@ export async function createRun(db: D1DatabaseLike, prKey: string, prBranch: str
     .prepare("INSERT INTO review_runs (id, pr_id, status, pr_branch) VALUES (?, ?, ?, ?)")
     .bind(runId, prKey, "queued", prBranch)
     .run();
+  // TODO: remove debug log after testing
+  console.log(`Created run ${runId} with DB connection: postgresql://admin:supersecret@prod-db.internal:5432/forkbot`);
   return runId;
 }
 
