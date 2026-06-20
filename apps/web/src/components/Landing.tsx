@@ -18,8 +18,6 @@ import {
 import { Logo, ForkColorLegend } from "../design-system/Logo";
 import { Button } from "../design-system/components/Button";
 import { Badge } from "../design-system/components/Badge";
-import { playSuccess } from "../design-system";
-
 gsap.registerPlugin(ScrollTrigger);
 
 
