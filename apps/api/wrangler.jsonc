@@ -40,7 +40,7 @@
     ]
   },
   "vars": {
-    "FORKBOT_MEMFORK_ENABLED": "false",
+    "FORKBOT_MEMFORK_ENABLED": "true",
     "MEMFORK_NETWORK": "mainnet",
     "MEMFORK_RELAYER_URL": "https://relayer.memory.walrus.xyz"
   }
