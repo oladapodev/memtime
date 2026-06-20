@@ -5,6 +5,7 @@ import {
   FolderOpen,
   GitPullRequest,
   ChatCircle,
+  Book,
   Sun,
   Moon,
   User,
@@ -17,14 +18,16 @@ import { Overview } from "./Overview";
 import { Repositories } from "./Repositories";
 import { Reviews } from "./Reviews";
 import { FeedbackStats } from "./FeedbackStats";
+import { Codebase } from "./Codebase";
 
-type Page = "overview" | "repos" | "reviews" | "feedback";
+type Page = "overview" | "repos" | "reviews" | "codebase" | "feedback";
 
 const NAV_ITEMS = [
   { id: "overview" as Page, icon: ChartBar, label: "Overview", shortcut: "1" },
   { id: "repos" as Page, icon: FolderOpen, label: "Repositories", shortcut: "2" },
   { id: "reviews" as Page, icon: GitPullRequest, label: "Reviews", shortcut: "3" },
-  { id: "feedback" as Page, icon: ChatCircle, label: "Feedback", shortcut: "4" },
+  { id: "codebase" as Page, icon: Book, label: "Codebase", shortcut: "4" },
+  { id: "feedback" as Page, icon: ChatCircle, label: "Feedback", shortcut: "5" },
 ];
 
 const pageVariants = {
@@ -42,7 +45,7 @@ export function Dashboard({ user }: { user: { login: string } | null }) {
     function handleKey(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       const map: Record<string, Page> = {
-        "1": "overview", "2": "repos", "3": "reviews", "4": "feedback",
+        "1": "overview", "2": "repos", "3": "reviews", "4": "codebase", "5": "feedback",
       };
       if (e.key in map) { navigate(map[e.key]); return; }
     }
@@ -138,6 +141,7 @@ export function Dashboard({ user }: { user: { login: string } | null }) {
             {page === "overview"  && <Overview />}
             {page === "repos"     && <Repositories />}
             {page === "reviews"   && <Reviews />}
+            {page === "codebase"  && <Codebase />}
             {page === "feedback"  && <FeedbackStats />}
           </motion.div>
         </AnimatePresence>

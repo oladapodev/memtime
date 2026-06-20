@@ -166,6 +166,21 @@ export async function listRuns(db: D1DatabaseLike, repo?: string): Promise<RunRe
 
 // ─── Index job storage ───────────────────────────────────────────
 
+/** Get the GitHub installation ID for a repo (used by index jobs) */
+export async function getInstallationForRepo(db: D1DatabaseLike, repoFullName: string): Promise<{
+  installationKey: string;
+  githubInstallationId: number;
+} | null> {
+  const row = await db
+    .prepare(`SELECT i.id as installationKey, i.github_installation_id as githubInstallationId
+       FROM repos r
+       JOIN installations i ON i.id = r.installation_id
+       WHERE r.full_name = ? AND i.status = 'active'`)
+    .bind(repoFullName)
+    .first<{ installationKey: string; githubInstallationId: number }>();
+  return row ?? null;
+}
+
 export async function getRepoId(db: D1DatabaseLike, fullName: string): Promise<string | null> {
   const row = await db
     .prepare("SELECT id FROM repos WHERE full_name = ?")

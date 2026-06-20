@@ -18,13 +18,8 @@ import {
 import { Logo, ForkColorLegend } from "../design-system/Logo";
 import { Button } from "../design-system/components/Button";
 import { Badge } from "../design-system/components/Badge";
-import { playSuccess } from "../design-system";
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface LandingProps {
-  onShowDemo: () => void;
-}
 
 const HOW_IT_WORKS = [
   {
@@ -105,7 +100,7 @@ const CODE_LINES = [
   { text: " Review posted → GitHub PR #142", color: null },
 ];
 
-export function Landing({ onShowDemo }: LandingProps) {
+export function Landing() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -196,10 +191,10 @@ export function Landing({ onShowDemo }: LandingProps) {
             </a>              <Button
                 variant="brand"
                 size="sm"
-                onClick={() => { playSuccess(); onShowDemo(); }}
+                onClick={() => window.location.href = '/api/auth/github'}
                 iconRight={<ArrowRight size={14} weight="bold" />}
               >
-                Try demo
+                Sign in with GitHub
               </Button>
               <Button
                 variant="secondary"
@@ -252,10 +247,10 @@ export function Landing({ onShowDemo }: LandingProps) {
               <Button
                 variant="brand"
                 size="lg"
-                onClick={() => { playSuccess(); onShowDemo(); }}
+                onClick={() => window.location.href = '/api/auth/github'}
                 iconRight={<ArrowRight size={16} weight="bold" />}
               >
-                Try the demo
+                Sign in with GitHub
               </Button>
               <Button variant="secondary" size="lg" iconLeft={<GitPullRequest size={16} weight="duotone" />}
                 onClick={() => window.open('https://github.com/apps/forkbot-dev/installations/new', '_blank')}>
@@ -374,15 +369,14 @@ export function Landing({ onShowDemo }: LandingProps) {
           <p className="mt-4 text-lg text-zinc-400">
             Connect your repo in under a minute. No config files, no YAML.
           </p>
-          <div className="mt-10 flex justify-center gap-3 flex-wrap">
-            <Button
-              variant="brand"
-              size="lg"
-              onClick={() => { playSuccess(); onShowDemo(); }}
-              iconRight={<ArrowRight size={16} weight="bold" />}
-            >
-              Open demo dashboard
-            </Button>
+          <div className="mt-10 flex justify-center gap-3 flex-wrap">              <Button
+                variant="brand"
+                size="lg"
+                onClick={() => window.location.href = '/api/auth/github'}
+                iconRight={<ArrowRight size={16} weight="bold" />}
+              >
+                Sign in with GitHub
+              </Button>
             <Button variant="secondary" size="lg" iconLeft={<Terminal size={16} weight="duotone" />}>
               View docs
             </Button>
