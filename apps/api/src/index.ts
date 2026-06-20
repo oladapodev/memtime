@@ -475,7 +475,15 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
   const userRes = await fetch("https://api.github.com/user", {
     headers: { Authorization: `Bearer ${tokenData.access_token}` },
   });
-  if (!userRes.ok) return json({ error: "user fetch failed" }, { status: 502 });
+  if (!userRes.ok) {
+    const userErrorText = await userRes.text();
+    console.error("GitHub user fetch failed", { status: userRes.status, body: userErrorText });
+    return json({
+      error: "user fetch failed",
+      detail: `GitHub returned ${userRes.status}: ${userErrorText.substring(0, 200)}`,
+      hint: "Make sure your GitHub App has user permissions configured (Account > User permissions > Read-only at minimum)"
+    }, { status: 502 });
+  }
   const user = await userRes.json() as { id: number; login: string };
 
   // Create session
