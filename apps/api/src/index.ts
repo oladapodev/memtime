@@ -18,7 +18,8 @@ import {
   getDocsForRepo,
   getTriggerConfig,
   saveTriggerConfig,
-  listRepos,
+  listInstallations,
+  listRepos as listReposFromDb,
   listRuns,
   markRunRunning,
   markInstallationActive,
@@ -341,9 +342,49 @@ async function handleLocalReview(request: Request, env: Env): Promise<Response> 
   });
 }
 
-// ─── Index job handler ──────────────────────────────────────────────
+// ─── Repo sync handler ──────────────────────────────────────────────
 
-async function runIndexJob(env: Env, job: IndexJob): Promise<void> {
+async function handleRepoSync(request: Request, env: Env): Promise<Response> {
+  const appId = requireEnv(env, "GITHUB_APP_ID");
+  const privateKey = requireEnv(env, "GITHUB_APP_PRIVATE_KEY");
+
+  const installations = await listInstallations(env.DB);
+  let totalSynced = 0;
+
+  for (const inst of installations) {
+    try {
+      const github = new GitHubAppClient({ appId, privateKey, installationId: inst.github_installation_id });
+      const token = await github.getInstallationToken();
+
+      // Fetch repos from GitHub for this installation
+      const reposRes = await fetch("https://api.github.com/installation/repositories", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "User-Agent": "forkbot-api/1.0",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      });
+
+      if (!reposRes.ok) {
+        console.error(`Failed to fetch repos for installation ${inst.github_installation_id}`, reposRes.status);
+        continue;
+      }
+
+      const reposData = await reposRes.json() as { repositories: Array<{ full_name: string; default_branch: string }> };
+      for (const repo of reposData.repositories) {
+        await upsertRepo(env.DB, inst.id, repo.full_name, repo.default_branch ?? "main");
+        totalSynced++;
+      }
+    } catch (error) {
+      console.error(`Error syncing repos for installation ${inst.github_installation_id}:`, error);
+    }
+  }
+
+  return json({ ok: true, installationsSynced: installations.length, reposSynced: totalSynced });
+}
+
+// ─── Index job handler ──────────────────────────────────────────────
   try {
     const appId = requireEnv(env, "GITHUB_APP_ID");
     const privateKey = requireEnv(env, "GITHUB_APP_PRIVATE_KEY");
@@ -548,7 +589,8 @@ export default {
       if (url.pathname === "/api/auth/session" && request.method === "GET") return handleSessionCheck(request, env);
       if (url.pathname === "/webhooks/github" && request.method === "POST") return handleGitHubWebhook(request, env);
       if (url.pathname === "/api/review/local" && request.method === "POST") return handleLocalReview(request, env);
-      if (url.pathname === "/api/repos" && request.method === "GET") return json(await listRepos(env.DB));
+      if (url.pathname === "/api/repos" && request.method === "GET") return json(await listReposFromDb(env.DB));
+      if (url.pathname === "/api/repos/sync" && request.method === "POST") return handleRepoSync(request, env);
       if (url.pathname.startsWith("/api/repos/") && request.method === "POST") {
         const repoFullName = url.pathname.split("/").at(3) ?? "";
         const action = url.pathname.split("/").at(4);

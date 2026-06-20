@@ -40,6 +40,7 @@ export function Repositories() {
   const [triggerModes, setTriggerModes] = useState<Map<string, string>>(new Map());
   const [savingTrigger, setSavingTrigger] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   const fetchRepos = useCallback(async () => {
     const res = await fetch("/api/repos");
@@ -117,9 +118,29 @@ export function Repositories() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <header>
-        <h2 className="font-heading text-2xl font-bold text-zinc-50">Repositories</h2>
-        <p className="text-sm text-zinc-500 mt-1">Manage indexed repositories and trigger settings</p>
+      <header className="flex items-center justify-between gap-4">
+        <div>
+          <h2 className="font-heading text-2xl font-bold text-zinc-50">Repositories</h2>
+          <p className="text-sm text-zinc-500 mt-1">Manage indexed repositories and trigger settings</p>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          iconLeft={<ArrowsClockwise size={14} weight={syncing ? "bold" : "regular"} />}
+          onClick={async () => {
+            setSyncing(true);
+            try {
+              const res = await fetch("/api/repos/sync", { method: "POST" });
+              if (res.ok) fetchRepos();
+            } catch {}
+            setSyncing(false);
+          }}
+          disabled={syncing}
+          loading={syncing}
+          sound
+        >
+          {syncing ? "Syncing…" : "Refresh from GitHub"}
+        </Button>
       </header>
 
       {loading ? (
@@ -164,8 +185,9 @@ export function Repositories() {
             )}
           </div>
 
-          {repos.filter((r) =>
-            r.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+          {(searchQuery
+            ? repos.filter((r) => r.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
+            : repos
           ).length === 0 ? (
             <Card className="p-6">
               <Empty
@@ -174,8 +196,9 @@ export function Repositories() {
                 message={`No repositories matching "${searchQuery}".`}
               />
             </Card>
-          ) : repos.filter((r) =>
-            r.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+          ) : (searchQuery
+            ? repos.filter((r) => r.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
+            : repos
           ).map((repo) => {
             const prog = progress.get(repo.full_name);
             const isIndexing = indexing.has(repo.full_name);
