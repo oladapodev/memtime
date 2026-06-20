@@ -471,11 +471,12 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
   const tokenData = await tokenRes.json() as { access_token?: string; error?: string };
   if (!tokenData.access_token) return json({ error: tokenData.error ?? "no token" }, { status: 502 });
 
-  // Fetch user info — needs Account > GitHub user profile (Read) in GitHub App settings
+  // Fetch user info
   const userRes = await fetch("https://api.github.com/user", {
     headers: {
       Authorization: `Bearer ${tokenData.access_token}`,
       Accept: "application/vnd.github+json",
+      "User-Agent": "forkbot-api/1.0",
       "X-GitHub-Api-Version": "2022-11-28",
     },
   });
