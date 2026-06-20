@@ -1,0 +1,8 @@
+{
+  "name": "@forkbot/indexer",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@forkbot/core": "workspace:*"
+  }
+}

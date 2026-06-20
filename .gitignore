@@ -203,6 +203,17 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Reference / PR Agent cloned repo
+referenc/
+
+# JavaScript / Bun / Cloudflare
+node_modules/
+bun.lock
+.bun-install/
+.bun-tmp/
+.wrangler/
+apps/web/dist/
+
 # Ruff stuff:
 .ruff_cache/
 

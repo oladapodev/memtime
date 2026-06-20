@@ -1,0 +1,6 @@
+{
+  "name": "@forkbot/feedback",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {}
+}

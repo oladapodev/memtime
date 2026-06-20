@@ -1,0 +1,47 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "forkbot-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-19",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "forkbot",
+      "database_id": "71d41287-7425-4b01-af2f-92f9702aee04"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vectorize": [
+    {
+      "binding": "VECTOR_INDEX",
+      "index_name": "forkbot-codebase"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "QUEUE",
+        "queue": "forkbot-jobs"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "forkbot-jobs"
+      }
+    ]
+  },
+  "vars": {
+    "FORKBOT_MEMFORK_ENABLED": "false",
+    "MEMFORK_NETWORK": "mainnet",
+    "MEMFORK_RELAYER_URL": "https://relayer.memory.walrus.xyz"
+  }
+}

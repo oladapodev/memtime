@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS variables ─────────────────────────────────────────────
+   Mirrors token values so GSAP / Web Audio can reference them.
+   Components should prefer Tailwind classes over direct var usage.
+──────────────────────────────────────────────────────────────── */
+:root {
+  /* Git-branch palette */
+  --color-crimson: #9F1239;
+  --color-amber:   #f59e0b;
+  --color-sky:     #0ea5e9;
+  --color-green:   #22c55e;
+  --color-purple:  #a855f7;
+  --color-slate:   #475569;
+
+  /* Surfaces */
+  --color-bg:      #09090b;
+  --color-surface: #18181b;
+  --color-raised:  #27272a;
+  --color-border:  #3f3f46;
+
+  /* Text */
+  --color-text:    #e4e4e7;
+  --color-heading: #fafafa;
+  --color-muted:   #71717a;
+
+  /* Motion */
+  --ease:          cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Base layer ────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* type-antialiased-on-retina */
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    color: var(--color-heading);
+    /* type-text-wrap-balance-headings */
+    text-wrap: balance;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  p {
+    /* type-text-wrap-pretty */
+    text-wrap: pretty;
+  }
+
+  code, pre, kbd {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    /* type-slashed-zero */
+    font-feature-settings: "zero" 1, "calt" 1;
+  }
+
+  /* type-letter-spacing-uppercase */
+  .uppercase, [class*="uppercase"] {
+    letter-spacing: 0.06em;
+  }
+
+  /* type-tabular-nums-for-data */
+  .tabular, [class*="tabular-nums"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* type-underline-offset */
+  a {
+    text-underline-offset: 3px;
+    color: var(--color-sky);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+
+  /* type-no-font-synthesis */
+  * {
+    font-synthesis: none;
+  }
+}
+
+/* ── Component layer ───────────────────────────────────────────── */
+@layer components {
+
+  /* Focus ring shared style */
+  .focus-ring {
+    @apply outline-none;
+    box-shadow: 0 0 0 2px var(--color-sky);
+  }
+
+  /* Gradient text (brand hero) */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-crimson) 0%, var(--color-amber) 40%, var(--color-sky) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow border */
+  .glow-border-crimson {
+    box-shadow: 0 0 0 1px rgba(159, 18, 57, 0.4), 0 0 20px rgba(159, 18, 57, 0.15);
+  }
+
+  /* Scrollbar (dark) */
+  ::-webkit-scrollbar         { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track   { background: transparent; }
+  ::-webkit-scrollbar-thumb   { background: var(--color-border); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+  /* Selection (native-selection-styling) */
+  ::selection {
+    background: rgba(159, 18, 57, 0.35);
+    color: #fafafa;
+  }
+
+  /* Input placeholder (native-placeholder-styling) */
+  ::placeholder { color: var(--color-muted); opacity: 1; }
+}
+
+/* ── Utilities ─────────────────────────────────────────────────── */
+@layer utilities {
+  /* visual-animate-shadow-pseudo — animate via pseudo not box-shadow */
+  .shadow-anim {
+    position: relative;
+  }
+  .shadow-anim::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    opacity: 0;
+    transition: opacity 200ms var(--ease);
+    pointer-events: none;
+  }
+  .shadow-anim:hover::after { opacity: 1; }
+}

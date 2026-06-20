@@ -1,0 +1,22 @@
+{
+  "name": "@forkbot/api",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "bun src/local.ts",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@forkbot/ai": "workspace:*",
+    "@forkbot/core": "workspace:*",
+    "@forkbot/github": "workspace:*",
+    "@forkbot/indexer": "workspace:*",
+    "@forkbot/mcp": "workspace:*",
+    "@forkbot/memforks": "workspace:*",
+    "@forkbot/sandbox": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250619.0",
+    "wrangler": "^4.0.0"
+  }
+}

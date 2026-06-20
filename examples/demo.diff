@@ -1,0 +1,24 @@
+diff --git a/src/middleware.ts b/src/middleware.ts
+index 3db25aa..91a8472 100644
+--- a/src/middleware.ts
++++ b/src/middleware.ts
+@@ -1,7 +1,11 @@
+ export async function middleware(req) {
+   const token = req.cookies.get("session")?.value
+-  await auth.verify(token)
++  const session = await cache.get(`session:${token}`)
++  if (session) return NextResponse.next()
++  const verified = await auth.verify(token)
++  await cache.set(`session:${token}`, verified, { ttl: 86400 })
+   return NextResponse.next()
+ }
+diff --git a/src/server/actions/profile.ts b/src/server/actions/profile.ts
+index 2a7ac19..8811af7 100644
+--- a/src/server/actions/profile.ts
++++ b/src/server/actions/profile.ts
+@@ -1,4 +1,6 @@
+ export async function updateProfile(formData) {
++  await db.user.update({
++    data: Object.fromEntries(formData)
++  })
+ }

@@ -1,0 +1,36 @@
+{
+  "name": "forkbot",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "bun --cwd apps/web dev",
+    "dev:api": "bun --cwd apps/api dev",
+    "build:web": "bun --cwd apps/web build",
+    "build:api": "bun build apps/api/src/index.ts --outfile /tmp/forkbot-api.js",
+    "review:demo": "bun packages/cli/src/index.ts review --diff examples/demo.diff --repo demo/forkguard --pr 482 --json",
+    "test": "bun test",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250619.0",
+    "@types/bun": "^1.2.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.0.0",
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "latest",
+    "@memfork/core": "latest",
+    "@memfork/vercel-ai": "latest",
+    "ai": "^4.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

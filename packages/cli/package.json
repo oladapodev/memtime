@@ -1,0 +1,12 @@
+{
+  "name": "forkbot",
+  "type": "module",
+  "bin": {
+    "forkbot": "./src/index.ts"
+  },
+  "dependencies": {
+    "@forkbot/core": "workspace:*",
+    "@forkbot/github": "workspace:*",
+    "@forkbot/memforks": "workspace:*"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@forkbot/sandbox",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@forkbot/core": "workspace:*",
+    "@forkbot/ai": "workspace:*"
+  }
+}

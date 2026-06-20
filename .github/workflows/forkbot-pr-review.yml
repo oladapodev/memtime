@@ -1,0 +1,38 @@
+name: ForkBot PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - name: ForkBot local review fallback
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+          FORKBOT_MEMFORK_ENABLED: ${{ vars.FORKBOT_MEMFORK_ENABLED || 'false' }}
+          MEMFORK_TREE_ID: ${{ secrets.MEMFORK_TREE_ID }}
+          MEMFORK_PRIVATE_KEY: ${{ secrets.MEMFORK_PRIVATE_KEY }}
+          MEMFORK_MEMWAL_ACCOUNT: ${{ secrets.MEMFORK_MEMWAL_ACCOUNT }}
+          MEMFORK_MEMWAL_KEY: ${{ secrets.MEMFORK_MEMWAL_KEY }}
+          MEMFORK_NETWORK: ${{ vars.MEMFORK_NETWORK || 'mainnet' }}
+          MEMFORK_RELAYER_URL: ${{ vars.MEMFORK_RELAYER_URL || 'https://relayer.memory.walrus.xyz' }}
+          MEMFORK_RESOLVER_ID: ${{ secrets.MEMFORK_RESOLVER_ID }}
+        run: bun packages/cli/src/index.ts review --range origin/${{ github.base_ref }}...HEAD --repo ${{ github.repository }} --pr ${{ github.event.pull_request.number }} > forkbot-review.md
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file forkbot-review.md
