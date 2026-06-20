@@ -193,15 +193,21 @@ export function Landing({ onShowDemo }: LandingProps) {
               className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors hidden sm:block"
             >
               Features
-            </a>
-            <Button
-              variant="brand"
-              size="sm"
-              onClick={() => { playSuccess(); onShowDemo(); }}
-              iconRight={<ArrowRight size={14} weight="bold" />}
-            >
-              Try demo
-            </Button>
+            </a>              <Button
+                variant="brand"
+                size="sm"
+                onClick={() => { playSuccess(); onShowDemo(); }}
+                iconRight={<ArrowRight size={14} weight="bold" />}
+              >
+                Try demo
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => window.location.href = '/api/auth/github'}
+              >
+                Sign in
+              </Button>
           </div>
         </div>
       </nav>
