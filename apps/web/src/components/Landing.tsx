@@ -22,9 +22,6 @@ import { playSuccess } from "../design-system";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface LandingProps {
-  onShowDemo: () => void;
-}
 
 const HOW_IT_WORKS = [
   {
@@ -105,7 +102,7 @@ const CODE_LINES = [
   { text: " Review posted → GitHub PR #142", color: null },
 ];
 
-export function Landing({ onShowDemo }: LandingProps) {
+export function Landing() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -196,17 +193,10 @@ export function Landing({ onShowDemo }: LandingProps) {
             </a>              <Button
                 variant="brand"
                 size="sm"
-                onClick={() => { playSuccess(); onShowDemo(); }}
+                onClick={() => window.location.href = '/api/auth/github'}
                 iconRight={<ArrowRight size={14} weight="bold" />}
               >
-                Try demo
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => window.location.href = '/api/auth/github'}
-              >
-                Sign in
+                Sign in with GitHub
               </Button>
           </div>
         </div>
@@ -252,14 +242,14 @@ export function Landing({ onShowDemo }: LandingProps) {
               <Button
                 variant="brand"
                 size="lg"
-                onClick={() => { playSuccess(); onShowDemo(); }}
+                onClick={() => window.location.href = '/api/auth/github'}
                 iconRight={<ArrowRight size={16} weight="bold" />}
               >
-                Try the demo
+                Sign in with GitHub
               </Button>
               <Button variant="secondary" size="lg" iconLeft={<GitPullRequest size={16} weight="duotone" />}
                 onClick={() => window.open('https://github.com/apps/forkbot-dev/installations/new', '_blank')}>
-                Connect GitHub
+                Install GitHub App
               </Button>
             </div>
             <ul className="hero-animate mt-8 flex flex-wrap gap-x-6 gap-y-2">
@@ -378,10 +368,10 @@ export function Landing({ onShowDemo }: LandingProps) {
             <Button
               variant="brand"
               size="lg"
-              onClick={() => { playSuccess(); onShowDemo(); }}
+              onClick={() => window.location.href = '/api/auth/github'}
               iconRight={<ArrowRight size={16} weight="bold" />}
             >
-              Open demo dashboard
+              Sign in with GitHub
             </Button>
             <Button variant="secondary" size="lg" iconLeft={<Terminal size={16} weight="duotone" />}>
               View docs

@@ -14,18 +14,13 @@ type Run = { id: string; repo: string; prNumber: number; status: string; summary
 type Finding = { severity: string; filePath?: string; file_path?: string; title: string; body: string; suggestion: string; memoryFact?: string; memory_fact?: string; feedbackType?: string; id?: string };
 type RunDetail = Run & { findings?: Finding[]; markdown?: string };
 
-const DEMO_DIFF = `diff --git a/src/middleware.ts b/src/middleware.ts
-+ const session = await cache.get(\`session:\${token}\`)
-+ if (session) return NextResponse.next()
-+ const verified = await auth.verify(token)
-+ await cache.set(\`session:\${token}\`, verified, { ttl: 86400 })`;
 
 export function Reviews() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [selected, setSelected] = useState<RunDetail | null>(null);
-  const [diff, setDiff] = useState(DEMO_DIFF);
-  const [repo, setRepo] = useState("demo/forkbot");
-  const [pr, setPr] = useState(42);
+  const [diff, setDiff] = useState("");
+  const [repo, setRepo] = useState("");
+  const [pr, setPr] = useState(1);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
