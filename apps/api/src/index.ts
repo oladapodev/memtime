@@ -461,7 +461,7 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
   const clientSecret = env.GITHUB_OAUTH_CLIENT_SECRET;
   if (!clientId || !clientSecret) return json({ error: "OAuth not configured" }, { status: 500 });
 
-  // Exchange code for access token
+  // Exchange code for access token (GitHub App OAuth — scopes are ignored, permissions come from App settings)
   const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -471,17 +471,22 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
   const tokenData = await tokenRes.json() as { access_token?: string; error?: string };
   if (!tokenData.access_token) return json({ error: tokenData.error ?? "no token" }, { status: 502 });
 
-  // Fetch user info
+  // Fetch user info — needs Account > GitHub user profile (Read) in GitHub App settings
   const userRes = await fetch("https://api.github.com/user", {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    headers: {
+      Authorization: `Bearer ${tokenData.access_token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
   });
   if (!userRes.ok) {
+    const userErrorText = await userRes.text();
     const userErrorText = await userRes.text();
     console.error("GitHub user fetch failed", { status: userRes.status, body: userErrorText });
     return json({
       error: "user fetch failed",
-      detail: `GitHub returned ${userRes.status}: ${userErrorText.substring(0, 200)}`,
-      hint: "Make sure your GitHub App has user permissions configured (Account > User permissions > Read-only at minimum)"
+      detail: `GitHub returned ${userRes.status}: ${userErrorText.substring(0, 300)}`,
+      hint: "Go to https://github.com/settings/apps/forkbot-dev → 'Permissions' > 'Account permissions' > set 'GitHub user profile' to 'Read-only' then Save."
     }, { status: 502 });
   }
   const user = await userRes.json() as { id: number; login: string };
