@@ -385,6 +385,8 @@ async function handleRepoSync(request: Request, env: Env): Promise<Response> {
 }
 
 // ─── Index job handler ──────────────────────────────────────────────
+
+async function runIndexJob(env: Env, job: IndexJob): Promise<void> {
   try {
     const appId = requireEnv(env, "GITHUB_APP_ID");
     const privateKey = requireEnv(env, "GITHUB_APP_PRIVATE_KEY");
